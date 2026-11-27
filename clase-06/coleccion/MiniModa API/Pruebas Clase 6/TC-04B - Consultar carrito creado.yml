@@ -1,0 +1,114 @@
+info:
+  name: TC-04B - Consultar carrito creado
+  type: http
+  seq: 6
+  tags:
+    - Carritos
+
+http:
+  method: GET
+  url: "{{baseUrl}}/carritos/:carritoId"
+  params:
+    - name: carritoId
+      value: "{{carritoIdTC04}}"
+      type: path
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        // Contrato: paths./carritos/{carritoId}.get.responses.200
+        test("TC-04B - Estado HTTP 200", function () {
+            expect(res.getStatus()).to.equal(200);
+        });
+
+        // Contrato: components.schemas.Carrito
+        test("Validar estructura del carrito recuperado", function () {
+            const body = res.getBody();
+
+            expect(body.id).to.be.a("string");
+            expect(body.estado).to.be.oneOf(["abierto", "cerrado"]);
+            expect(body.items).to.be.an("array");
+            expect(body.subtotal).to.be.a("number");
+        });
+
+        // Contrato: paths./carritos/{carritoId}.get
+        test("El ID coincide con el carrito creado", function () {
+            expect(res.getBody().id).to.equal(
+                bru.getVar("carritoIdTC04")
+            );
+        });
+
+        // Verificar que el carrito creado permanece vacio
+        test("El carrito conserva su estado inicial", function () {
+            const body = res.getBody();
+
+            expect(body.estado).to.equal("abierto");
+            expect(body.items).to.have.lengthOf(0);
+            expect(body.subtotal).to.equal(0);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: El carrito.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId"
+      method: GET
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": "c-1",
+            "estado": "abierto",
+            "items": [
+              {
+                "productoId": 0,
+                "nombre": "",
+                "precioUnitario": 0,
+                "cantidad": 0,
+                "subtotal": 0
+              }
+            ],
+            "subtotal": 0
+          }
+  - name: 404 Response
+    description: No existe el carrito.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId"
+      method: GET
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }

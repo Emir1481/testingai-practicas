@@ -1,0 +1,4 @@
+name: publicada
+variables:
+  - name: baseUrl
+    value: https://minimoda-api-test.onrender.com

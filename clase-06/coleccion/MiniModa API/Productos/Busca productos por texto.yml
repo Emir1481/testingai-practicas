@@ -1,0 +1,85 @@
+info:
+  name: Busca productos por texto
+  type: http
+  seq: 2
+  tags:
+    - Productos
+
+http:
+  method: GET
+  url: "{{baseUrl}}/productos/buscar"
+  params:
+    - name: q
+      value: ""
+      type: query
+      description: Texto a buscar, al menos 2 caracteres.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Resultado de la búsqueda.
+    request:
+      url: "{{baseUrl}}/productos/buscar"
+      method: GET
+      params:
+        - name: q
+          value: ""
+          type: query
+          description: Texto a buscar, al menos 2 caracteres.
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "q": "",
+            "total": 0,
+            "productos": [
+              {
+                "id": 4,
+                "nombre": "Remera Dino Aventurero",
+                "categoria": "Niño (3-8)",
+                "color": "Verde",
+                "precio": 0,
+                "talla": "6",
+                "stock": 0
+              }
+            ]
+          }
+  - name: 400 Response
+    description: Falta q o tiene menos de 2 caracteres.
+    request:
+      url: "{{baseUrl}}/productos/buscar"
+      method: GET
+      params:
+        - name: q
+          value: ""
+          type: query
+          description: Texto a buscar, al menos 2 caracteres.
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+
+docs: "Busca en nombre, categoría y color. Objetivo de tiempo de respuesta acordado con el equipo: p95 menor a 300 ms con la carga esperada (20 usuarios a la vez)."

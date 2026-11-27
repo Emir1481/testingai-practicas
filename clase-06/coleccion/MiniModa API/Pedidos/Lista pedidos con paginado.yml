@@ -1,0 +1,98 @@
+info:
+  name: Lista pedidos con paginado
+  type: http
+  seq: 2
+  tags:
+    - Pedidos
+
+http:
+  method: GET
+  url: "{{baseUrl}}/pedidos"
+  params:
+    - name: pagina
+      value: "1"
+      type: query
+      description: Número de página, desde 1.
+    - name: limite
+      value: "10"
+      type: query
+      description: Cantidad de elementos por página.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Página de pedidos.
+    request:
+      url: "{{baseUrl}}/pedidos"
+      method: GET
+      params:
+        - name: pagina
+          value: "1"
+          type: query
+          description: Número de página, desde 1.
+        - name: limite
+          value: "10"
+          type: query
+          description: Cantidad de elementos por página.
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "pagina": 0,
+            "limite": 0,
+            "total": 0,
+            "pedidos": [
+              {
+                "id": "p-1",
+                "carritoId": "",
+                "email": "",
+                "pais": "",
+                "subtotal": 0,
+                "envio": 0,
+                "total": 0,
+                "estado": "confirmado",
+                "creado": ""
+              }
+            ]
+          }
+  - name: 400 Response
+    description: Algún parámetro no es válido.
+    request:
+      url: "{{baseUrl}}/pedidos"
+      method: GET
+      params:
+        - name: pagina
+          value: "1"
+          type: query
+          description: Número de página, desde 1.
+        - name: limite
+          value: "10"
+          type: query
+          description: Cantidad de elementos por página.
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }

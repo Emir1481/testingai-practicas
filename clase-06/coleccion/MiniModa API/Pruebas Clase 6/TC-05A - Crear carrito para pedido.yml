@@ -1,0 +1,74 @@
+info:
+  name: TC-05A - Crear carrito para pedido
+  type: http
+  seq: 7
+  tags:
+    - Carritos
+
+http:
+  method: POST
+  url: "{{baseUrl}}/carritos"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        // Contrato: paths./carritos.post.responses.201
+        test("TC-05A - Carrito creado correctamente", function () {
+            expect(res.getStatus()).to.equal(201);
+        });
+
+        // Contrato: components.schemas.Carrito
+        test("Validar carrito nuevo", function () {
+            const body = res.getBody();
+
+            expect(body.id).to.be.a("string");
+            expect(body.estado).to.equal("abierto");
+            expect(body.items).to.be.an("array");
+            expect(body.items).to.have.lengthOf(0);
+            expect(body.subtotal).to.be.a("number");
+        });
+
+        // Guardar datos para las siguientes solicitudes
+        if (res.getStatus() === 201) {
+            bru.setVar("carritoIdTC05", res.getBody().id);
+            bru.setVar("claveTC05", "clase6-" + Date.now());
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 201 Response
+    description: Carrito creado.
+    request:
+      url: "{{baseUrl}}/carritos"
+      method: POST
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": "c-1",
+            "estado": "abierto",
+            "items": [
+              {
+                "productoId": 0,
+                "nombre": "",
+                "precioUnitario": 0,
+                "cantidad": 0,
+                "subtotal": 0
+              }
+            ],
+            "subtotal": 0
+          }

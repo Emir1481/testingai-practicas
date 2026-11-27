@@ -1,0 +1,277 @@
+info:
+  name: TC-05C - Confirmar pedido
+  type: http
+  seq: 9
+  tags:
+    - Pedidos
+
+http:
+  method: POST
+  url: "{{baseUrl}}/pedidos"
+  headers:
+    - name: Idempotency-Key
+      value: "\t{{claveTC05}}"
+      description: Clave única elegida por el cliente para poder reintentar sin duplicar el pedido.
+  body:
+    type: json
+    data: |-
+      {
+        "carritoId": "{{carritoIdTC05}}",
+        "email": "ana@ejemplo.com",
+        "tarjeta": "4111111111111111",
+        "pais": "AR"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        // Contrato: paths./pedidos.post.responses.201
+        test("TC-05C - Pedido confirmado correctamente", function () {
+            expect(res.getStatus()).to.equal(201);
+        });
+
+        // Contrato: components.schemas.Pedido
+        test("Validar estructura del pedido", function () {
+            const body = res.getBody();
+
+            expect(body.id).to.be.a("string");
+            expect(body.carritoId).to.be.a("string");
+            expect(body.email).to.be.a("string");
+            expect(body.pais).to.be.a("string");
+            expect(body.subtotal).to.be.a("number");
+            expect(body.envio).to.be.a("number");
+            expect(body.total).to.be.a("number");
+            expect(body.estado).to.equal("confirmado");
+            expect(body.creado).to.be.a("string");
+        });
+
+        // Contrato: components.schemas.NuevoPedido
+        test("El pedido corresponde al carrito creado", function () {
+            expect(res.getBody().carritoId).to.equal(
+                bru.getVar("carritoIdTC05")
+            );
+        });
+
+        // Guardar el pedido original para comparar
+        // con la segunda solicitud de idempotencia
+        if (res.getStatus() === 201) {
+            bru.setVar("pedidoIdTC05", res.getBody().id);
+            bru.setVar("pedidoOriginalTC05", JSON.stringify(res.getBody()));
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 201 Response
+    description: Pedido confirmado.
+    request:
+      url: "{{baseUrl}}/pedidos"
+      method: POST
+      headers:
+        - name: Idempotency-Key
+          value: ""
+          description: Clave única elegida por el cliente para poder reintentar sin duplicar el pedido.
+          disabled: true
+      body:
+        type: json
+        data: |-
+          {
+            "carritoId": "c-1",
+            "email": "ana@ejemplo.com",
+            "tarjeta": "4111111111111111",
+            "pais": "AR"
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": "p-1",
+            "carritoId": "",
+            "email": "",
+            "pais": "",
+            "subtotal": 0,
+            "envio": 0,
+            "total": 0,
+            "estado": "confirmado",
+            "creado": ""
+          }
+  - name: 400 Response
+    description: Cuerpo inválido (email, tarjeta, país o carrito vacío).
+    request:
+      url: "{{baseUrl}}/pedidos"
+      method: POST
+      headers:
+        - name: Idempotency-Key
+          value: ""
+          description: Clave única elegida por el cliente para poder reintentar sin duplicar el pedido.
+          disabled: true
+      body:
+        type: json
+        data: |-
+          {
+            "carritoId": "c-1",
+            "email": "ana@ejemplo.com",
+            "tarjeta": "4111111111111111",
+            "pais": "AR"
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 402 Response
+    description: Pago rechazado por la tarjeta de prueba.
+    request:
+      url: "{{baseUrl}}/pedidos"
+      method: POST
+      headers:
+        - name: Idempotency-Key
+          value: ""
+          description: Clave única elegida por el cliente para poder reintentar sin duplicar el pedido.
+          disabled: true
+      body:
+        type: json
+        data: |-
+          {
+            "carritoId": "c-1",
+            "email": "ana@ejemplo.com",
+            "tarjeta": "4111111111111111",
+            "pais": "AR"
+          }
+    response:
+      status: 402
+      statusText: Payment Required
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 404 Response
+    description: No existe el carrito.
+    request:
+      url: "{{baseUrl}}/pedidos"
+      method: POST
+      headers:
+        - name: Idempotency-Key
+          value: ""
+          description: Clave única elegida por el cliente para poder reintentar sin duplicar el pedido.
+          disabled: true
+      body:
+        type: json
+        data: |-
+          {
+            "carritoId": "c-1",
+            "email": "ana@ejemplo.com",
+            "tarjeta": "4111111111111111",
+            "pais": "AR"
+          }
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 409 Response
+    description: El carrito ya se convirtió en pedido.
+    request:
+      url: "{{baseUrl}}/pedidos"
+      method: POST
+      headers:
+        - name: Idempotency-Key
+          value: ""
+          description: Clave única elegida por el cliente para poder reintentar sin duplicar el pedido.
+          disabled: true
+      body:
+        type: json
+        data: |-
+          {
+            "carritoId": "c-1",
+            "email": "ana@ejemplo.com",
+            "tarjeta": "4111111111111111",
+            "pais": "AR"
+          }
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 422 Response
+    description: La Idempotency-Key ya se usó con otro cuerpo.
+    request:
+      url: "{{baseUrl}}/pedidos"
+      method: POST
+      headers:
+        - name: Idempotency-Key
+          value: ""
+          description: Clave única elegida por el cliente para poder reintentar sin duplicar el pedido.
+          disabled: true
+      body:
+        type: json
+        data: |-
+          {
+            "carritoId": "c-1",
+            "email": "ana@ejemplo.com",
+            "tarjeta": "4111111111111111",
+            "pais": "AR"
+          }
+    response:
+      status: 422
+      statusText: Unprocessable Entity
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+
+docs: "Cierra el carrito. Acepta el encabezado `Idempotency-Key`: si llega otra vez la misma clave con el mismo cuerpo, devuelve el mismo pedido con el encabezado `Idempotent-Replayed: true` y no crea otro. Si la clave llega con un cuerpo distinto, responde 422."

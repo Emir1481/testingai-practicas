@@ -1,0 +1,99 @@
+info:
+  name: Obtiene un producto
+  type: http
+  seq: 3
+  tags:
+    - Productos
+
+http:
+  method: GET
+  url: "{{baseUrl}}/productos/:id"
+  params:
+    - name: id
+      value: "1"
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: El producto existe.
+    request:
+      url: "{{baseUrl}}/productos/:id"
+      method: GET
+      params:
+        - name: id
+          value: "1"
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "producto": {
+              "id": 4,
+              "nombre": "Remera Dino Aventurero",
+              "categoria": "Niño (3-8)",
+              "color": "Verde",
+              "precio": 0,
+              "talla": "6",
+              "stock": 0
+            }
+          }
+  - name: 400 Response
+    description: El id no es un entero positivo.
+    request:
+      url: "{{baseUrl}}/productos/:id"
+      method: GET
+      params:
+        - name: id
+          value: "1"
+          type: path
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 404 Response
+    description: No existe un producto con ese id.
+    request:
+      url: "{{baseUrl}}/productos/:id"
+      method: GET
+      params:
+        - name: id
+          value: "1"
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }

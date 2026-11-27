@@ -1,0 +1,203 @@
+info:
+  name: TC-05B - Agregar producto al carrito
+  type: http
+  seq: 8
+  tags:
+    - Carritos
+
+http:
+  method: POST
+  url: "{{baseUrl}}/carritos/:carritoId/items"
+  params:
+    - name: carritoId
+      value: "{{carritoIdTC05}}"
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "productoId": 3,
+        "cantidad": 1
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        // Contrato: paths./carritos/{carritoId}/items.post.responses.201
+        test("TC-05B - Producto agregado correctamente", function () {
+            expect(res.getStatus()).to.equal(201);
+        });
+
+        // Contrato: components.schemas.Carrito
+        test("El carrito corresponde al creado", function () {
+            const body = res.getBody();
+
+            expect(body.id).to.equal(bru.getVar("carritoIdTC05"));
+            expect(body.estado).to.equal("abierto");
+            expect(body.items).to.be.an("array");
+        });
+
+        // Contrato: components.schemas.ItemCarrito
+        test("Validar producto y cantidad", function () {
+            const item = res.getBody().items.find(
+                item => item.productoId === 3
+            );
+
+            expect(item).to.exist;
+            expect(item.cantidad).to.equal(1);
+        });
+
+        // Contrato: components.schemas.ItemCarrito.properties
+        test("Validar tipos de datos del item", function () {
+            const item = res.getBody().items.find(
+                item => item.productoId === 3
+            );
+
+            expect(item.productoId).to.be.a("number");
+            expect(item.nombre).to.be.a("string");
+            expect(item.precioUnitario).to.be.a("number");
+            expect(item.cantidad).to.be.a("number");
+            expect(item.subtotal).to.be.a("number");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 201 Response
+    description: Item agregado. Devuelve el carrito completo.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items"
+      method: POST
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "productoId": 4,
+            "cantidad": 2
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": "c-1",
+            "estado": "abierto",
+            "items": [
+              {
+                "productoId": 0,
+                "nombre": "",
+                "precioUnitario": 0,
+                "cantidad": 0,
+                "subtotal": 0
+              }
+            ],
+            "subtotal": 0
+          }
+  - name: 400 Response
+    description: "Cuerpo inválido: productoId o cantidad fuera de regla."
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items"
+      method: POST
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "productoId": 4,
+            "cantidad": 2
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 404 Response
+    description: No existe el carrito o el producto.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items"
+      method: POST
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "productoId": 4,
+            "cantidad": 2
+          }
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 409 Response
+    description: El carrito está cerrado o no hay stock suficiente.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items"
+      method: POST
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "productoId": 4,
+            "cantidad": 2
+          }
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+
+docs: Si el producto ya está en el carrito, suma la cantidad.
