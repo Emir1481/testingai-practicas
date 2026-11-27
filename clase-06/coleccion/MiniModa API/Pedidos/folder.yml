@@ -1,0 +1,10 @@
+info:
+  name: Pedidos
+  type: folder
+
+request:
+  auth: inherit
+
+docs:
+  content: Confirmación y consulta de pedidos
+  type: text/markdown

@@ -1,0 +1,168 @@
+info:
+  name: TC-03 - Valor limite precio maximo
+  type: http
+  seq: 4
+  tags:
+    - Productos
+
+http:
+  method: GET
+  url: "{{baseUrl}}/productos?max=0"
+  params:
+    - name: max
+      value: "0"
+      type: query
+    - name: edad
+      value: ""
+      type: query
+      description: Comienzo de la categoría de edad, por ejemplo `Bebé` o `Niño`.
+      disabled: true
+    - name: color
+      value: ""
+      type: query
+      description: Color exacto, sin distinguir mayúsculas.
+      disabled: true
+    - name: max
+      value: "0"
+      type: query
+      description: "Precio máximo, inclusive: devuelve los productos con precio menor o igual a `max`."
+      disabled: true
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        // Contrato: paths./productos.get.responses.200
+        test("TC-03 - Estado HTTP 200", function () {
+            expect(res.getStatus()).to.equal(200);
+        });
+
+        // Contrato: components.schemas.ListaProductos
+        test("Validar estructura de la respuesta", function () {
+            const body = res.getBody();
+
+            expect(body.pagina).to.be.a("number");
+            expect(body.limite).to.be.a("number");
+            expect(body.total).to.be.a("number");
+            expect(body.productos).to.be.an("array");
+        });
+
+        // Contrato: paths./productos.get.parameters (max)
+        // Precio máximo inclusive, mínimo permitido 0
+        test("Todos los productos cumplen el precio maximo", function () {
+            const productos = res.getBody().productos;
+
+            expect(productos).to.be.an("array");
+
+            productos.forEach(producto => {
+                expect(producto.precio).to.be.a("number");
+                expect(producto.precio).to.be.at.most(0);
+            });
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Página de productos.
+    request:
+      url: "{{baseUrl}}/productos"
+      method: GET
+      params:
+        - name: edad
+          value: ""
+          type: query
+          description: Comienzo de la categoría de edad, por ejemplo `Bebé` o `Niño`.
+          disabled: true
+        - name: color
+          value: ""
+          type: query
+          description: Color exacto, sin distinguir mayúsculas.
+          disabled: true
+        - name: max
+          value: "0"
+          type: query
+          description: "Precio máximo, inclusive: devuelve los productos con precio menor o igual a `max`."
+          disabled: true
+        - name: pagina
+          value: "1"
+          type: query
+          description: Número de página, desde 1.
+        - name: limite
+          value: "10"
+          type: query
+          description: Cantidad de elementos por página.
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "pagina": 0,
+            "limite": 0,
+            "total": 0,
+            "productos": [
+              {
+                "id": 4,
+                "nombre": "Remera Dino Aventurero",
+                "categoria": "Niño (3-8)",
+                "color": "Verde",
+                "precio": 0,
+                "talla": "6",
+                "stock": 0
+              }
+            ]
+          }
+  - name: 400 Response
+    description: Algún parámetro no es válido.
+    request:
+      url: "{{baseUrl}}/productos"
+      method: GET
+      params:
+        - name: edad
+          value: ""
+          type: query
+          description: Comienzo de la categoría de edad, por ejemplo `Bebé` o `Niño`.
+          disabled: true
+        - name: color
+          value: ""
+          type: query
+          description: Color exacto, sin distinguir mayúsculas.
+          disabled: true
+        - name: max
+          value: "0"
+          type: query
+          description: "Precio máximo, inclusive: devuelve los productos con precio menor o igual a `max`."
+          disabled: true
+        - name: pagina
+          value: "1"
+          type: query
+          description: Número de página, desde 1.
+        - name: limite
+          value: "10"
+          type: query
+          description: Cantidad de elementos por página.
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }

@@ -1,0 +1,76 @@
+info:
+  name: Obtiene un pedido
+  type: http
+  seq: 3
+  tags:
+    - Pedidos
+
+http:
+  method: GET
+  url: "{{baseUrl}}/pedidos/:pedidoId"
+  params:
+    - name: pedidoId
+      value: p-1
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: El pedido.
+    request:
+      url: "{{baseUrl}}/pedidos/:pedidoId"
+      method: GET
+      params:
+        - name: pedidoId
+          value: p-1
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": "p-1",
+            "carritoId": "",
+            "email": "",
+            "pais": "",
+            "subtotal": 0,
+            "envio": 0,
+            "total": 0,
+            "estado": "confirmado",
+            "creado": ""
+          }
+  - name: 404 Response
+    description: No existe el pedido.
+    request:
+      url: "{{baseUrl}}/pedidos/:pedidoId"
+      method: GET
+      params:
+        - name: pedidoId
+          value: p-1
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }

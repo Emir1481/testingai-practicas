@@ -1,0 +1,86 @@
+﻿Pruebas Clase 6\00 - Preparacion carrito TC-02 (201 Created) - 16 ms
+Tests
+   Ô£ô Carrito creado correctamente
+Pruebas Clase 6\TC-01 - Producto inexistente (200 OK) - 3 ms
+Tests
+   Ô£ò TC-01 - Estado HTTP 404
+      expected 200 to equal 404
+   Ô£ò La respuesta contiene los campos obligatorios
+      expected { producto: null } to have property 'codigo'
+   Ô£ò Los campos de error tienen los tipos correctos
+      expected undefined to be a string
+Pruebas Clase 6\TC-02 - Cantidad invalida (201 Created) - 3 ms
+Tests
+   Ô£ò TC-02 - Rechazar cantidad igual a cero
+      expected 201 to equal 400
+   Ô£ò Validar estructura del error
+      expected undefined to be a string
+Pruebas Clase 6\TC-03 - Valor limite precio maximo (200 OK) - 3 ms
+Tests
+   Ô£ô TC-03 - Estado HTTP 200
+   Ô£ô Validar estructura de la respuesta
+   Ô£ô Todos los productos cumplen el precio maximo
+Pruebas Clase 6\TC-04A - Crear carrito (201 Created) - 2 ms
+Tests
+   Ô£ô TC-04A - Carrito creado correctamente
+   Ô£ô Validar estructura del carrito
+   Ô£ô El carrito se crea vacio
+Pruebas Clase 6\TC-04B - Consultar carrito creado (200 OK) - 2 ms
+Tests
+   Ô£ô TC-04B - Estado HTTP 200
+   Ô£ô Validar estructura del carrito recuperado
+   Ô£ô El ID coincide con el carrito creado
+   Ô£ô El carrito conserva su estado inicial
+Pruebas Clase 6\TC-05A - Crear carrito para pedido (201 Created) - 7 ms
+Tests
+   Ô£ô TC-05A - Carrito creado correctamente
+   Ô£ô Validar carrito nuevo
+Pruebas Clase 6\TC-05B - Agregar producto al carrito (201 Created) - 2 ms
+Tests
+   Ô£ò Validar tipos de datos del item
+      expected '5600' to be a number
+   Ô£ô TC-05B - Producto agregado correctamente
+   Ô£ô El carrito corresponde al creado
+   Ô£ô Validar producto y cantidad
+Pruebas Clase 6\TC-05C - Confirmar pedido (201 Created) - 4 ms
+Tests
+   Ô£ô TC-05C - Pedido confirmado correctamente
+   Ô£ô Validar estructura del pedido
+   Ô£ô El pedido corresponde al carrito creado
+Pruebas Clase 6\TC-05D - Repetir pedido con misma clave (201 Created) - 3 ms
+Tests
+   Ô£ô TC-05D - Estado HTTP 201
+   Ô£ô El ID del pedido es el mismo
+   Ô£ô Validar encabezado Idempotent-Replayed
+   Ô£ô La respuesta coincide con el pedido original
+Pruebas Clase 6\TC-05E - Verificar ausencia de pedidos duplicados (200 OK) - 20 ms
+Tests
+   Ô£ô TC-05E - Estado HTTP 200
+   Ô£ô Validar listado de pedidos
+   Ô£ô No se genero un pedido duplicado
+Pruebas Clase 6\TC-06 - Formato de error (400 Bad Request) - 2 ms
+Tests
+   Ô£ô TC-06 - Estado HTTP 400
+   Ô£ô Validar campos obligatorios del error
+   Ô£ô Validar tipo de dato del codigo
+   Ô£ô Validar tipo de dato del mensaje
+   Ô£ô Validar estructura de detalles
+Pruebas Clase 6\TC-07 - Busqueda de productos (200 OK) - 35 ms
+Tests
+   Ô£ô TC-07 - Estado HTTP 200
+   Ô£ô Productos es una lista
+
+­ƒôè Execution Summary
+ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+Ôöé Metric        Ôöé          Result          Ôöé
+Ôö£ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöñ
+Ôöé Status        Ôöé          Ô£ù FAIL          Ôöé
+Ôö£ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöñ
+Ôöé Requests      Ôöé 13 (10 Passed, 3 Failed) Ôöé
+Ôö£ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöñ
+Ôöé Tests         Ôöé          33/39           Ôöé
+Ôö£ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöñ
+Ôöé Assertions    Ôöé           0/0            Ôöé
+Ôö£ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö╝ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöñ
+Ôöé Duration (ms) Ôöé           1588           Ôöé
+ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö┤ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ

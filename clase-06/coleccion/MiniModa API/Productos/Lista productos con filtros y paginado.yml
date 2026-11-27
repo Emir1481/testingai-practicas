@@ -1,0 +1,141 @@
+info:
+  name: Lista productos con filtros y paginado
+  type: http
+  seq: 1
+  tags:
+    - Productos
+
+http:
+  method: GET
+  url: "{{baseUrl}}/productos"
+  params:
+    - name: edad
+      value: ""
+      type: query
+      description: Comienzo de la categoría de edad, por ejemplo `Bebé` o `Niño`.
+      disabled: true
+    - name: color
+      value: ""
+      type: query
+      description: Color exacto, sin distinguir mayúsculas.
+      disabled: true
+    - name: max
+      value: "0"
+      type: query
+      description: "Precio máximo, inclusive: devuelve los productos con precio menor o igual a `max`."
+      disabled: true
+    - name: pagina
+      value: "1"
+      type: query
+      description: Número de página, desde 1.
+    - name: limite
+      value: "10"
+      type: query
+      description: Cantidad de elementos por página.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Página de productos.
+    request:
+      url: "{{baseUrl}}/productos"
+      method: GET
+      params:
+        - name: edad
+          value: ""
+          type: query
+          description: Comienzo de la categoría de edad, por ejemplo `Bebé` o `Niño`.
+          disabled: true
+        - name: color
+          value: ""
+          type: query
+          description: Color exacto, sin distinguir mayúsculas.
+          disabled: true
+        - name: max
+          value: "0"
+          type: query
+          description: "Precio máximo, inclusive: devuelve los productos con precio menor o igual a `max`."
+          disabled: true
+        - name: pagina
+          value: "1"
+          type: query
+          description: Número de página, desde 1.
+        - name: limite
+          value: "10"
+          type: query
+          description: Cantidad de elementos por página.
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "pagina": 0,
+            "limite": 0,
+            "total": 0,
+            "productos": [
+              {
+                "id": 4,
+                "nombre": "Remera Dino Aventurero",
+                "categoria": "Niño (3-8)",
+                "color": "Verde",
+                "precio": 0,
+                "talla": "6",
+                "stock": 0
+              }
+            ]
+          }
+  - name: 400 Response
+    description: Algún parámetro no es válido.
+    request:
+      url: "{{baseUrl}}/productos"
+      method: GET
+      params:
+        - name: edad
+          value: ""
+          type: query
+          description: Comienzo de la categoría de edad, por ejemplo `Bebé` o `Niño`.
+          disabled: true
+        - name: color
+          value: ""
+          type: query
+          description: Color exacto, sin distinguir mayúsculas.
+          disabled: true
+        - name: max
+          value: "0"
+          type: query
+          description: "Precio máximo, inclusive: devuelve los productos con precio menor o igual a `max`."
+          disabled: true
+        - name: pagina
+          value: "1"
+          type: query
+          description: Número de página, desde 1.
+        - name: limite
+          value: "10"
+          type: query
+          description: Cantidad de elementos por página.
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }

@@ -1,0 +1,170 @@
+info:
+  name: Cambia la cantidad de un item
+  type: http
+  seq: 3
+  tags:
+    - Carritos
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/carritos/:carritoId/items/:productoId"
+  params:
+    - name: carritoId
+      value: c-1
+      type: path
+    - name: productoId
+      value: "4"
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "cantidad": 3
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Cantidad cambiada. Devuelve el carrito completo.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items/:productoId"
+      method: PATCH
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+        - name: productoId
+          value: "4"
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "cantidad": 3
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": "c-1",
+            "estado": "abierto",
+            "items": [
+              {
+                "productoId": 0,
+                "nombre": "",
+                "precioUnitario": 0,
+                "cantidad": 0,
+                "subtotal": 0
+              }
+            ],
+            "subtotal": 0
+          }
+  - name: 400 Response
+    description: Falta cantidad o no es un entero mayor o igual a 1.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items/:productoId"
+      method: PATCH
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+        - name: productoId
+          value: "4"
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "cantidad": 3
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 404 Response
+    description: No existe el carrito o el producto no está en el carrito.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items/:productoId"
+      method: PATCH
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+        - name: productoId
+          value: "4"
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "cantidad": 3
+          }
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 409 Response
+    description: El carrito está cerrado o no hay stock suficiente.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items/:productoId"
+      method: PATCH
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+        - name: productoId
+          value: "4"
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "cantidad": 3
+          }
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }

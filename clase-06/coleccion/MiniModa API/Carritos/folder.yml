@@ -1,0 +1,10 @@
+info:
+  name: Carritos
+  type: folder
+
+request:
+  auth: inherit
+
+docs:
+  content: Carrito de compras
+  type: text/markdown

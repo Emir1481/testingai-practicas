@@ -1,0 +1,31 @@
+info:
+  name: Vuelve los datos al estado inicial
+  type: http
+  seq: 2
+  tags:
+    - Sistema
+
+http:
+  method: POST
+  url: "{{baseUrl}}/reset"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 204 Response
+    description: Datos reiniciados. Sin cuerpo.
+    request:
+      url: "{{baseUrl}}/reset"
+      method: POST
+    response:
+      status: 204
+      statusText: No Content
+      body:
+        type: text
+        data: ""

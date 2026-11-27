@@ -1,0 +1,14 @@
+opencollection: 1.0.0
+
+info:
+  name: MiniModa API
+
+docs:
+  content: "API de práctica de la tienda MiniModa para el curso TestingAI (AcademiaQA). Datos ficticios, todo en memoria. Las tarjetas son de prueba: 4111111111111111 aprueba y 4000000000000002 se rechaza. Para volver al estado inicial, `POST /reset`."
+  type: text/markdown
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

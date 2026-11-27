@@ -1,0 +1,10 @@
+info:
+  name: Productos
+  type: folder
+
+request:
+  auth: inherit
+
+docs:
+  content: Catálogo y búsqueda
+  type: text/markdown

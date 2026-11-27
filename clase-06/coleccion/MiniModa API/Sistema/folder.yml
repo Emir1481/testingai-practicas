@@ -1,0 +1,10 @@
+info:
+  name: Sistema
+  type: folder
+
+request:
+  auth: inherit
+
+docs:
+  content: Estado de la API y reinicio de datos
+  type: text/markdown

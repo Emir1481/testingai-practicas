@@ -1,0 +1,97 @@
+info:
+  name: Quita un item del carrito
+  type: http
+  seq: 4
+  tags:
+    - Carritos
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/carritos/:carritoId/items/:productoId"
+  params:
+    - name: carritoId
+      value: c-1
+      type: path
+    - name: productoId
+      value: "4"
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 204 Response
+    description: Item quitado. Sin cuerpo.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items/:productoId"
+      method: DELETE
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+        - name: productoId
+          value: "4"
+          type: path
+    response:
+      status: 204
+      statusText: No Content
+      body:
+        type: text
+        data: ""
+  - name: 404 Response
+    description: No existe el carrito o el producto no está en el carrito. Repetir el DELETE de un item ya quitado devuelve 404 y el carrito no cambia.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items/:productoId"
+      method: DELETE
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+        - name: productoId
+          value: "4"
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 409 Response
+    description: El carrito está cerrado.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId/items/:productoId"
+      method: DELETE
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+        - name: productoId
+          value: "4"
+          type: path
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }

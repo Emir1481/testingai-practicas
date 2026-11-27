@@ -1,0 +1,62 @@
+info:
+  name: Crea un carrito vacío
+  type: http
+  seq: 1
+  tags:
+    - Carritos
+
+http:
+  method: POST
+  url: "{{baseUrl}}/carritos"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        // Contrato: paths./carritos.post.responses.201
+        test("Carrito creado correctamente", function () {
+            expect(res.getStatus()).to.equal(201);
+        });
+
+        // Guardar el ID para las siguientes solicitudes
+        if (res.getStatus() === 201) {
+            bru.setVar("carritoId", res.getBody().id);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 201 Response
+    description: Carrito creado.
+    request:
+      url: "{{baseUrl}}/carritos"
+      method: POST
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": "c-1",
+            "estado": "abierto",
+            "items": [
+              {
+                "productoId": 0,
+                "nombre": "",
+                "precioUnitario": 0,
+                "cantidad": 0,
+                "subtotal": 0
+              }
+            ],
+            "subtotal": 0
+          }

@@ -1,0 +1,174 @@
+info:
+  name: TC-06 - Formato de error
+  type: http
+  seq: 12
+  tags:
+    - Productos
+
+http:
+  method: GET
+  url: "{{baseUrl}}/productos?pagina=0"
+  params:
+    - name: pagina
+      value: "0"
+      type: query
+    - name: edad
+      value: ""
+      type: query
+      description: Comienzo de la categoría de edad, por ejemplo `Bebé` o `Niño`.
+      disabled: true
+    - name: color
+      value: ""
+      type: query
+      description: Color exacto, sin distinguir mayúsculas.
+      disabled: true
+    - name: max
+      value: "0"
+      type: query
+      description: "Precio máximo, inclusive: devuelve los productos con precio menor o igual a `max`."
+      disabled: true
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        // Contrato: paths./productos.get.parameters (pagina)
+        // Contrato: paths./productos.get.responses.400
+        test("TC-06 - Estado HTTP 400", function () {
+            expect(res.getStatus()).to.equal(400);
+        });
+
+        // Contrato: components.schemas.Error.required
+        test("Validar campos obligatorios del error", function () {
+            const body = res.getBody();
+
+            expect(body).to.have.property("codigo");
+            expect(body).to.have.property("mensaje");
+            expect(body).to.have.property("detalles");
+        });
+
+        // Contrato: components.schemas.Error.properties
+        test("Validar tipo de dato del codigo", function () {
+            expect(res.getBody().codigo).to.be.a("string");
+        });
+
+        test("Validar tipo de dato del mensaje", function () {
+            expect(res.getBody().mensaje).to.be.a("string");
+        });
+
+        test("Validar estructura de detalles", function () {
+            const detalles = res.getBody().detalles;
+
+            expect(detalles).to.be.an("array");
+
+            detalles.forEach(detalle => {
+                expect(detalle).to.be.a("string");
+            });
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Página de productos.
+    request:
+      url: "{{baseUrl}}/productos"
+      method: GET
+      params:
+        - name: edad
+          value: ""
+          type: query
+          description: Comienzo de la categoría de edad, por ejemplo `Bebé` o `Niño`.
+          disabled: true
+        - name: color
+          value: ""
+          type: query
+          description: Color exacto, sin distinguir mayúsculas.
+          disabled: true
+        - name: max
+          value: "0"
+          type: query
+          description: "Precio máximo, inclusive: devuelve los productos con precio menor o igual a `max`."
+          disabled: true
+        - name: pagina
+          value: "1"
+          type: query
+          description: Número de página, desde 1.
+        - name: limite
+          value: "10"
+          type: query
+          description: Cantidad de elementos por página.
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "pagina": 0,
+            "limite": 0,
+            "total": 0,
+            "productos": [
+              {
+                "id": 4,
+                "nombre": "Remera Dino Aventurero",
+                "categoria": "Niño (3-8)",
+                "color": "Verde",
+                "precio": 0,
+                "talla": "6",
+                "stock": 0
+              }
+            ]
+          }
+  - name: 400 Response
+    description: Algún parámetro no es válido.
+    request:
+      url: "{{baseUrl}}/productos"
+      method: GET
+      params:
+        - name: edad
+          value: ""
+          type: query
+          description: Comienzo de la categoría de edad, por ejemplo `Bebé` o `Niño`.
+          disabled: true
+        - name: color
+          value: ""
+          type: query
+          description: Color exacto, sin distinguir mayúsculas.
+          disabled: true
+        - name: max
+          value: "0"
+          type: query
+          description: "Precio máximo, inclusive: devuelve los productos con precio menor o igual a `max`."
+          disabled: true
+        - name: pagina
+          value: "1"
+          type: query
+          description: Número de página, desde 1.
+        - name: limite
+          value: "10"
+          type: query
+          description: Cantidad de elementos por página.
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }

@@ -1,0 +1,79 @@
+info:
+  name: "Obtiene un carrito "
+  type: http
+  seq: 5
+  tags:
+    - Carritos
+
+http:
+  method: GET
+  url: "{{baseUrl}}/carritos/:carritoId"
+  params:
+    - name: carritoId
+      value: c-1
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: El carrito.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId"
+      method: GET
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": "c-1",
+            "estado": "abierto",
+            "items": [
+              {
+                "productoId": 0,
+                "nombre": "",
+                "precioUnitario": 0,
+                "cantidad": 0,
+                "subtotal": 0
+              }
+            ],
+            "subtotal": 0
+          }
+  - name: 404 Response
+    description: No existe el carrito.
+    request:
+      url: "{{baseUrl}}/carritos/:carritoId"
+      method: GET
+      params:
+        - name: carritoId
+          value: c-1
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }

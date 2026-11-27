@@ -1,0 +1,126 @@
+info:
+  name: TC-01 - Producto inexistente
+  type: http
+  seq: 2
+  tags:
+    - Productos
+
+http:
+  method: GET
+  url: "{{baseUrl}}/productos/999"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        // Contrato: paths./productos/{id}.get.responses.404
+        test("TC-01 - Estado HTTP 404", function () {
+            expect(res.getStatus()).to.equal(404);
+        });
+
+        // Contrato: components.schemas.Error
+        test("La respuesta contiene los campos obligatorios", function () {
+            const body = res.getBody();
+
+            expect(body).to.have.property("codigo");
+            expect(body).to.have.property("mensaje");
+            expect(body).to.have.property("detalles");
+        });
+
+        // Contrato: components.schemas.Error.properties
+        test("Los campos de error tienen los tipos correctos", function () {
+            const body = res.getBody();
+
+            expect(body.codigo).to.be.a("string");
+            expect(body.mensaje).to.be.a("string");
+            expect(body.detalles).to.be.an("array");
+
+            body.detalles.forEach(detalle => {
+                expect(detalle).to.be.a("string");
+            });
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: El producto existe.
+    request:
+      url: "{{baseUrl}}/productos/:id"
+      method: GET
+      params:
+        - name: id
+          value: "1"
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "producto": {
+              "id": 4,
+              "nombre": "Remera Dino Aventurero",
+              "categoria": "Niño (3-8)",
+              "color": "Verde",
+              "precio": 0,
+              "talla": "6",
+              "stock": 0
+            }
+          }
+  - name: 400 Response
+    description: El id no es un entero positivo.
+    request:
+      url: "{{baseUrl}}/productos/:id"
+      method: GET
+      params:
+        - name: id
+          value: "1"
+          type: path
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
+  - name: 404 Response
+    description: No existe un producto con ese id.
+    request:
+      url: "{{baseUrl}}/productos/:id"
+      method: GET
+      params:
+        - name: id
+          value: "1"
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "codigo": "VALIDACION",
+            "mensaje": "",
+            "detalles": []
+          }
